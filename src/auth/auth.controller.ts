@@ -7,7 +7,7 @@ import {
   Req,
   HttpException,
 } from '@nestjs/common';
-import { Response, Request } from 'express';
+import { Response, Request, response } from 'express';
 
 import { AuthService } from './auth.service';
 import UserDto from './dto/UserDto';
@@ -25,9 +25,19 @@ export class AuthController {
 
     if (token) {
       response.cookie('token', token, {
-        maxAge: 60 * 1000,
+        maxAge: 5 * 60 * 1000,
       });
     }
+  }
+
+  @Get('/auth')
+  async auth(@Req() request: Request) {
+    const user = await this.authService.getUser(request);
+  }
+
+  @Get('/logout')
+  async logout(@Res({ passthrough: true }) response: Response) {
+    response.cookie('token', 'www');
   }
 
   @Post('/login')
@@ -44,7 +54,8 @@ export class AuthController {
 
   @Get('/home')
   async getHomePageData(@Req() request: Request) {
-    const token = request.cookies['token'];
-    await this.authService.getHomePageData(token);
+    const user = await this.authService.getUser(request);
+
+    return user;
   }
 }

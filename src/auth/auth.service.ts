@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import User from 'typeorm/User';
 import UserToken from 'typeorm/UserToken';
 import { nanoid } from 'nanoid';
+import { Request } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -66,7 +67,12 @@ export class AuthService {
     return token;
   }
 
-  async getHomePageData(token: string) {
+  async getUser(request: Request) {
+    const token = request.cookies['token'];
+
+    if (!token)
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+
     const user = await this.userTokenRepository
       .createQueryBuilder('token')
       .leftJoinAndSelect('token.user', 'user')
@@ -74,5 +80,7 @@ export class AuthService {
       .getOne();
 
     if (!user) throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+
+    return user.user;
   }
 }

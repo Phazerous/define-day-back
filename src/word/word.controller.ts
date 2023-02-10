@@ -21,8 +21,6 @@ export class WordController {
 
     const word = await this.wordService.createWord(user, wordCreationDto);
 
-    console.log(word);
-
     return word;
   }
 

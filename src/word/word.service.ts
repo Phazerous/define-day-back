@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { HttpStatus } from '@nestjs/common/enums';
+import { HttpException } from '@nestjs/common/exceptions';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import Definition from 'typeorm/Definition';
@@ -43,9 +45,13 @@ export class WordService {
       relations: ['definitions'],
     });
 
-    if (!word) throw new Error('Something went wrong');
+    if (!word)
+      throw new HttpException(
+        'User with specified email address already exists.',
+        HttpStatus.BAD_REQUEST,
+      );
 
-    const prevDefs: Definition[] = word.definitions ? word.definitions : [];
+    const prevDefs: Definition[] = word.definitions || [];
 
     const defsToSave: Definition[] = [];
 

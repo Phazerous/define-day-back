@@ -79,7 +79,9 @@ export class AuthService {
       .where('token = :tokenId', { tokenId: token })
       .getOne();
 
-    if (!user) throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    if (!user) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
 
     return user.user;
   }
